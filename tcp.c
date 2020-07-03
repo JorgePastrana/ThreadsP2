@@ -1,4 +1,4 @@
-/************ PART 2 of Programming Project ***********/
+/************ Parte 2 de la práctica ***********/
 #include <stdio.h>
 #include <stdlib.h>
 #include "type.h"
@@ -8,14 +8,13 @@ PROC *sleepList;
 PROC *readyQueue;
 PROC *running;
 #include "queue.c"
-/****** implement these functions ******/
+/****** Funciones a agregadas ******/
 int tsleep(int event);
 int twakeup(int event);
 int texit(int status);
 int join(int pid, int *status);
-void func(void *parm);
 /****** end of implementations *********/
-
+void func(void *parm);
 int init() { 
 	int i, j; 
 	PROC *p; 
@@ -90,7 +89,7 @@ switch (c){
 case 'c' : do_create(); break;
 case 's' : do_switch(); break;
 case 'q' : do_exit(); break;
-case 'j' : mensaje = do_join(1,&status); break;
+case 'j' : printf("Ingrese el pid: ");mensaje = getchar(); getchar(); do_join(mensaje-48,&status); break;
 }
 }
 }
@@ -130,14 +129,14 @@ printf("All tasks ended: P0 loops\n");
 while(1);
 }
 
-int tsleep(int event)
+int tsleep(int event)//La misma función que se utiliza en las partes pasadas
 {
   running->event=event;
   running->status = SLEEP;
   enqueue(&sleepList,running);
   tswitch();
 }
-int twakeup(int event)
+int twakeup(int event)//La misma función que se utiliza en las partes pasadas
 {
   PROC **LS = &sleepList;
   PROC *p = *LS;
@@ -164,16 +163,16 @@ int join(int targetPID,int *status){
 			taskwithtargetpid=1;
 			h=p;
 		}
-		} 
+		} //Busca que haya un proceso disponible para unirse con el target pid
 		
 		if(!taskwithtargetpid)
 			{
 			printf("NOTHREAD Error, no hay un hilo disponible con el PID: %d\n",targetPID);
 			return NOTHREAD;//No hay proceso disponible con ese pid en readyqueue	
 			}
-		if(h->joinPid==running->pid){
+		if(h->joinPid==running->pid){//Corrobora que no se genere un Deadlock con el target pid
 			printf("DEADLOCK error\n");
-			return DEADLOCK;//Deadlock mortal alv
+			return DEADLOCK;//Deadlock 
 		}
 		running->joinPid = targetPID;
 		running->joinPtr = h;
@@ -190,7 +189,7 @@ int join(int targetPID,int *status){
 
 }
 
-int texit(int value) { 
+int texit(int value) { //La misma función que se utiliza en las partes pasadas, unicamente se modifica la busqueda de padres-familiares por los joinPid
 	printf("task %d in texit value=%d\n", running->pid, running->pid);
 		
 	PROC **LS = &sleepList;
@@ -209,6 +208,7 @@ int texit(int value) {
 		running->priority = 0;
 		enqueue(&freeList, running); 
 		printList("freeList", freeList);
+//////////////////////////////////////////////////
 	}
 	else{
 	 	running->status=ZOMBIE;
